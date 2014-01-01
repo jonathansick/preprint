@@ -5,15 +5,15 @@ from cliff.app import App
 from cliff.commandmanager import CommandManager
 
 
-class DemoApp(App):
+class PreprintApp(App):
 
     log = logging.getLogger(__name__)
 
     def __init__(self):
-        super(DemoApp, self).__init__(
-            description='cliff demo app',
+        super(PreprintApp, self).__init__(
+            description='Tools for writing latex papers',
             version='0.1',
-            command_manager=CommandManager('cliff.demo'),
+            command_manager=CommandManager('preprint.commands'),
             )
 
     def initialize_app(self, argv):
@@ -29,7 +29,7 @@ class DemoApp(App):
 
 
 def main(argv=sys.argv[1:]):
-    myapp = DemoApp()
+    myapp = PreprintApp()
     return myapp.run(argv)
 
 
