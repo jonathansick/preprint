@@ -19,6 +19,13 @@ class PreprintApp(App):
     def initialize_app(self, argv):
         self.log.debug('initialize_app')
 
+    def build_option_parser(self, *args):
+        parser = super(PreprintApp, self).build_option_parser(*args)
+        parser.add_argument('--master',
+            default="paper.tex",
+            help='Name of master tex file')
+        return parser
+
     def prepare_to_run_command(self, cmd):
         self.log.debug('prepare_to_run_command %s', cmd.__class__.__name__)
 

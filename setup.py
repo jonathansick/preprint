@@ -48,9 +48,7 @@ setup(
             'preprint = preprint.main:main'
         ],
         'preprint.commands': [
-            'simple = preprint.simple:Simple',
-            'two_part = preprint.simple:Simple',
-            'error = preprint.simple:Error',
+            'watch = preprint.watch:Watch',
         ],
     },
 
