@@ -18,10 +18,10 @@ class Watch(Command):
         parser = super(Watch, self).get_parser(prog_name)
         parser.add_argument('--exts',
             nargs='*',
-            default=['tex', 'pdf', 'eps'],
+            default=self.app.confs.config('exts'),
             help="File extensions to look for")
         parser.add_argument('--cmd',
-            default='make',
+            default=self.app.confs.config('cmd'),
             help="Command to run on changes")
         return parser
 

@@ -4,10 +4,13 @@ import sys
 from cliff.app import App
 from cliff.commandmanager import CommandManager
 
+from .config import Configurations
+
 
 class PreprintApp(App):
 
     log = logging.getLogger(__name__)
+    confs = Configurations()
 
     def __init__(self):
         super(PreprintApp, self).__init__(
@@ -22,7 +25,7 @@ class PreprintApp(App):
     def build_option_parser(self, *args):
         parser = super(PreprintApp, self).build_option_parser(*args)
         parser.add_argument('--master',
-            default="paper.tex",
+            default=self.confs.config('master'),
             help='Name of master tex file')
         return parser
 
