@@ -22,7 +22,7 @@ setup(
     author='Jonathan Sick',
     author_email='jonathansick@mac.com',
 
-    url='http://jonathansick.ca',
+    url='https://github.com/jonathansick/preprint',
     download_url='',
 
     classifiers=['Development Status :: 3 - Alpha',
@@ -37,7 +37,7 @@ setup(
     scripts=[],
 
     provides=[],
-    install_requires=['cliff'],
+    install_requires=['cliff', 'watchdog'],
 
     namespace_packages=[],
     packages=find_packages(),
