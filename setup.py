@@ -49,6 +49,7 @@ setup(
         ],
         'preprint.commands': [
             'watch = preprint.watch:Watch',
+            'diff = preprint.latexdiff:Diff',
         ],
     },
 
