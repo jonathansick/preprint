@@ -6,6 +6,7 @@ Command for running latexdiff.
 
 import logging
 import os
+import re
 import subprocess
 import codecs
 import git
@@ -52,6 +53,7 @@ class Diff(Command):
         """Inline the current manuscript."""
         with codecs.open(root_tex, 'r', encoding='utf-8') as f:
             root_text = f.read()
+            root_text = self._remove_comments(root_text)
             root_text = inline(root_text)
         output_path = "_current.tex"
         if os.path.exists(output_path):
@@ -63,6 +65,7 @@ class Diff(Command):
     def _inline_prev(self, commit_ref, root_tex):
         """Inline the previous manuscript in the git tree."""
         root_text = read_git_blob(commit_ref, root_tex)
+        root_text = self._remove_comments(root_text)
         root_text = inline_blob(commit_ref, root_text)
         output_path = "_prev.tex"
         if os.path.exists(output_path):
@@ -70,6 +73,10 @@ class Diff(Command):
         with codecs.open(output_path, 'w', encoding='utf-8') as f:
             f.write(root_text)
         return output_path
+
+    def _remove_comments(self, tex):
+        # Expression via http://stackoverflow.com/a/13365225
+        return re.sub(ur'[^\\]%.*', ur'', tex)
 
     def _get_n_commits(self):
         """docstring for _get_n_commits"""
