@@ -83,12 +83,12 @@ pack
 This pipeline includes:
 
 1. Creating a build directory and copying over just the required manuscript files
-2. Inlining all inputted latex files.
-3. Moving figures to the root directory and updating tex source,
-4. Deleting comments,
-6. (todo) Renaming figures to conform to AASTeX if necessary,
-7. (todo) Making JPEG versions of figures to to fulfil arXiv file size requirements, if necessary,
-8. (todo) Copying the ``.bbl`` bibliography or inlining it into the manuscript, as necessary.
+2. Inlining all inputted latex files
+3. Moving figures to the root directory and updating tex source
+4. Deleting comments
+5. *todo*: Renaming figures to conform to AASTeX if necessary
+6. *todo*: Making JPEG versions of figures to to fulfil arXiv file size requirements, if necessary
+7. *todo*: Copying the ``.bbl`` bibliography or inlining it into the manuscript, as necessary.
 
 This command is inspired by Erik Tollerud's `Astropysics package <http://pythonhosted.org/Astropysics/coremods/publication.html>`_, but is designed around regular expressions for text transformation.
 The implementation should thus be easier.
