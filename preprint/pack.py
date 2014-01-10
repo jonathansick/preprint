@@ -10,7 +10,7 @@ import shutil
 import codecs
 import re
 
-from preprint.textools import inline
+from preprint.textools import inline, remove_comments
 
 from cliff.command import Command
 
@@ -35,17 +35,12 @@ class Package(Command):
             root_text = f.read()
 
         tex = inline(root_text)
-        tex = self._delete_comments(tex)
+        tex = remove_comments(tex)
         tex = self._flatten_figures(tex, dirname)
 
         output_tex_path = os.path.join(dirname,
                 os.path.basename(self.app.options.master))
         self._write_tex(tex, output_tex_path)
-
-    def _delete_comments(self, tex):
-        """Remove all comments from the manuscript."""
-        # Expression via http://stackoverflow.com/a/13365225
-        return re.sub(ur'[^\\]%.*', ur'', tex)
 
     def _flatten_figures(self, tex, dirname):
         """Discover figures and copy to root of build directory.

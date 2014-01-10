@@ -93,6 +93,23 @@ def inline_blob(commit_ref, root_text):
     return result
 
 
+def remove_comments(tex):
+    """Delete latex comments from a manuscript.
+    
+    Parameters
+    ----------
+    tex : unicode
+        The latex manuscript
+
+    Returns
+    -------
+    tex : unicode
+        The manuscript without comments.
+    """
+    # Expression via http://stackoverflow.com/a/13365225
+    return re.sub(ur'[^\\]%.*', ur'', tex)
+
+
 def main():
     with codecs.open("root.tex", 'r', encoding='utf-8') as f:
         txt = f.read()
