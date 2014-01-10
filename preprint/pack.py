@@ -10,7 +10,7 @@ import shutil
 import codecs
 import re
 
-from preprint.inline import inline
+from preprint.textools import inline
 
 from cliff.command import Command
 

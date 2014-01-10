@@ -11,7 +11,8 @@ import subprocess
 import codecs
 import git
 
-from preprint.inline import inline, inline_blob, read_git_blob
+from preprint.textools import inline, inline_blob
+from preprint.gittools import read_git_blob
 
 from cliff.command import Command
 

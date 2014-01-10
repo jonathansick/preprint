@@ -1,26 +1,26 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
+Utilities for maniuplating latex documents.
+
+
+Inlining latex documents
+------------------------
+
 Inline \input{*} latex files. Useful for packaging and latexdiff.
 
 There are groups of functions: tools for working with latex files on the
 regular filesystem, and functions for working with files embedded as
 blobs in the git tree.
 
-For files on the file system:
-
-- :func:`inline` and :func:`_sub_inline`.
-
-For files in the git tree:
-
-- :func:`read_git_blob` to read text from a git blob
+- :func:`inline` and :func:`_sub_inline` for inlining documents in the
+  filesystem.
 - :func:`inline_blob` to inline text from files in the git tree.
 """
 
 import re
 import codecs
-import git
-import os
+from preprint.gittools import read_git_blob
 
 
 def inline(root_text):
@@ -91,41 +91,6 @@ def inline_blob(commit_ref, root_text):
     input_pattern = re.compile(ur'\\input{(.*)}', re.UNICODE)
     result = input_pattern.sub(_sub_blob, root_text)
     return result
-
-
-def read_git_blob(commit_ref, path):
-    """Get text from a git blob."""
-    repo = git.Repo('.')
-    tree = repo.tree(commit_ref)
-    dirname, fname = os.path.split(path)
-    if dirname == '':
-        text =_read_blob(tree, fname)
-    else:
-        components = path.split(os.sep)
-        text = _read_blob_in_tree(tree, components)
-    return text
-
-
-def _read_blob_in_tree(tree, components):
-    """Recursively open trees to ultimately read a blob"""
-    if len(components) == 1:
-        # Tree is direct parent of blob
-        return _read_blob(tree, components[0])
-    else:
-        # Still trees to open
-        dirname = components.pop(0)
-        for t in tree.trees:
-            if t.name == dirname:
-                return _read_blob_in_tree(t, components)
-
-
-def _read_blob(tree, filename):
-    for blb in tree.blobs:
-        if blb.name == filename:
-            txt = unicode(blb.data_stream.read(), 'utf-8')
-            # txt = txt.encode('utf-8')
-            return txt
-    return None
 
 
 def main():
