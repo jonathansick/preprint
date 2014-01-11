@@ -23,6 +23,28 @@ import codecs
 from preprint.gittools import read_git_blob
 
 
+def inline_bbl(root_tex, bbl_tex):
+    """Inline a compiled bibliography (.bbl) in place of a bibliography
+    environment.
+
+    Parameters
+    ----------
+    root_tex : unicode
+        Text to process.
+    bbl_tex : unicode
+        Text of bibliography file.
+
+    Returns
+    -------
+    txt : str
+        Text with bibliography included.
+    """
+    bbl_tex = bbl_tex.replace(u'\\', u'\\\\')
+    bib_pattern = re.compile(ur'\\bibliography{.*}', re.UNICODE)
+    result = bib_pattern.sub(bbl_tex, root_tex)
+    return result
+
+
 def inline(root_text):
     """Inline all input latex files. The inlining is accomplished
     recursively.
@@ -31,12 +53,12 @@ def inline(root_text):
 
     Parameters
     ----------
-    root_txt : str
+    root_txt : unicode
         Text to process (and include in-lined files).
 
     Returns
     -------
-    txt : str
+    txt : unicode
         Text with referenced files included.
     """
     input_pattern = re.compile(ur'\\input{(.*)}', re.UNICODE)

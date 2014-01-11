@@ -10,7 +10,7 @@ import shutil
 import codecs
 import re
 
-from preprint.textools import inline, remove_comments
+from preprint.textools import inline, remove_comments, inline_bbl
 
 from cliff.command import Command
 
@@ -31,12 +31,22 @@ class Package(Command):
         if not os.path.exists(dirname):
             os.makedirs(dirname)
 
+        bbl_path = ".".join((os.path.splitext(self.app.options.master)[0],
+            'bbl'))
+
         with codecs.open(self.app.options.master, 'r', encoding='utf-8') as f:
             root_text = f.read()
-
         tex = inline(root_text)
         tex = remove_comments(tex)
         tex = self._flatten_figures(tex, dirname)
+        if os.path.exists(bbl_path):
+            print "found bbl", bbl_path
+            with codecs.open(bbl_path, 'r', encoding='utf-8') as f:
+                bbl_text = f.read()
+                print bbl_text
+            tex = inline_bbl(tex, bbl_text)
+        else:
+            print "No", bbl_path
 
         output_tex_path = os.path.join(dirname,
                 os.path.basename(self.app.options.master))
