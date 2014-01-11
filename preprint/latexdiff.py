@@ -51,7 +51,7 @@ class Diff(Command):
         subprocess.call(ldiff_cmd, shell=True)
 
         # Compile the diff document with latexmk
-        ltmk_cmd = "latexmk -f -pdf -bibtex-cond -c -gg {0}.tex".format(
+        ltmk_cmd = "latexmk -f -pdf -bibtex-cond {0}.tex".format(
                 diff_path)
         subprocess.call(ltmk_cmd, shell=True)
 
@@ -61,6 +61,18 @@ class Diff(Command):
         pdf_path = "{0}.pdf".format(name)
         if os.path.exists(pdf_path):
             shutil.move(pdf_path, os.path.join("build", pdf_path))
+
+        # Clean up
+        ltmk_cmd = "latexmk -f -pdf -bibtex-cond -c {0}.tex".format(
+                diff_path)
+        subprocess.call(ltmk_cmd, shell=True)
+        build_exts = ['Notes.bib', '.bbl', '.tex']
+        for ext in build_exts:
+            path = "".join((name, ext))
+            if os.path.exists(path):
+                os.remove(path)
+        os.remove(prev_path)
+        os.remove(current_path)
 
     def _inline_current(self, root_tex):
         """Inline the current manuscript."""
