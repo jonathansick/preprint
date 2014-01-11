@@ -8,6 +8,7 @@ import logging
 import os
 import subprocess
 import codecs
+import shutil
 import git
 
 from preprint.textools import inline, inline_blob, remove_comments
@@ -26,7 +27,7 @@ class Diff(Command):
         parser.add_argument('prev_commit',
             help="Commit SHA to compare HEAD against.")
         parser.add_argument('-n', '--name',
-            default="diff",
+            default=None,
             help="Name of the difference file.")
         return parser
 
@@ -36,8 +37,13 @@ class Diff(Command):
         prev_path = self._inline_prev(parsed_args.prev_commit,
                 self.app.options.master)
 
+        if parsed_args.name is None:
+            name = "HEAD_{0}".format(parsed_args.prev_commit)
+        else:
+            name = parsed_args.name
+
         # Run latexmk
-        diff_path = os.path.splitext(parsed_args.name)[0]
+        diff_path = os.path.splitext(name)[0]
         ldiff_cmd = "latexdiff {prev} {current} > {diff}.tex".format(
                 prev=prev_path,
                 current=current_path,
@@ -48,6 +54,13 @@ class Diff(Command):
         ltmk_cmd = "latexmk -f -pdf -bibtex-cond -c -gg {0}.tex".format(
                 diff_path)
         subprocess.call(ltmk_cmd, shell=True)
+
+        # Copy to build directory
+        if not os.path.exists("build"):
+            os.makedirs("build")
+        pdf_path = "{0}.pdf".format(name)
+        if os.path.exists(pdf_path):
+            shutil.move(pdf_path, os.path.join("build", pdf_path))
 
     def _inline_current(self, root_tex):
         """Inline the current manuscript."""
