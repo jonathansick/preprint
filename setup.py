@@ -37,7 +37,7 @@ setup(
     scripts=[],
 
     provides=[],
-    install_requires=['cliff', 'watchdog'],
+    install_requires=['cliff', 'watchdog', 'GitPython'],
 
     namespace_packages=[],
     packages=find_packages(),

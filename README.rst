@@ -8,7 +8,7 @@ Installation requires `cliff <https://cliff.readthedocs.org/en/latest/>`_, the `
 To install ``preprint``, run ``python setup.py install``.
 Then try ``preprint --help`` for more info.
 
-Preprint currently supports the following command (see below for a reference):
+Preprint currently supports the following commands (see below for a reference):
 
 - ``preprint watch`` to automatically compile the paper if source is changed,
 - ``preprint diff`` to run ``latexdiff`` against a commit in Git,
