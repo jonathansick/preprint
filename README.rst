@@ -45,12 +45,28 @@ watch
 
 Usage::
 
-    preprint [--master MASTER] watch [--exts EXT1, ..., EXTN; --cmd CMD]
+    preprint [--master MASTER] watch [--exts EXT1, ..., EXTN; --cmd CMD; --diff [SHA]]
 
     Optional arguments:
     --master   Name of the root LaTeX file (eg, paper.tex)
     --exts     List of file extensions (defaults to `pdf eps tex`)
     --cmd      Name of command to run when a change occurs (defaults to `make`)
+    --diff     Run a latexdiff compile against the given commit SHA from the git repository (HEAD if blank).
+
+For example, to continuously compile the document whenever ``.tex`` or figures have changed, and assuming you've setup a ``preprint.json`` file with the name of your master document, just run::
+
+    preprint watch
+
+To continuously run a latexdiff-based compile, showing all changes you've made against the HEAD of the git repository, run::
+
+    preprint watch --diff
+
+The document will be saved to ``build/PAPER_NAME_diff.pdf``.
+This is a nice way of keeping track of what you're doing.
+
+Finally, to continuously run a latediff-based compile against an arbitrary commit in your git history, just copy the commit SHA fragment (say, ``b91688d``) and run::
+
+    preprint watch --diff b91688d
 
 
 diff
