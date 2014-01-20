@@ -24,12 +24,24 @@ class Package(Command):
         parser = super(Package, self).get_parser(prog_name)
         parser.add_argument('name',
             help="Name of packaged manuscript (saved to build/name).")
+        parser.add_argument('--style',
+            default="aastex",
+            help="Build style (aastex, arxiv).")
+        parser.add_argument('--exts',
+            nargs='*',
+            default=self.app.confs.config('exts'),
+            help="Figure extensions to use in order of priority")
         return parser
 
     def take_action(self, parsed_args):
         dirname = os.path.join("build", parsed_args.name)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
+
+        self._build_style = parsed_args.style
+        self._ext_priority = parsed_args.exts
+
+        print "_ext_priority", self._ext_priority
 
         bbl_path = ".".join((os.path.splitext(self.app.options.master)[0],
             'bbl'))
@@ -40,10 +52,8 @@ class Package(Command):
         tex = remove_comments(tex)
         tex = self._flatten_figures(tex, dirname)
         if os.path.exists(bbl_path):
-            print "found bbl", bbl_path
             with codecs.open(bbl_path, 'r', encoding='utf-8') as f:
                 bbl_text = f.read()
-                print bbl_text
             tex = inline_bbl(tex, bbl_text)
         else:
             print "No", bbl_path
@@ -61,9 +71,14 @@ class Package(Command):
             A dictionary of with figure names (without extension or directory)
             as the key and the current full path as the value.
         """
-        figs = discover_figures(tex)
+        figs = discover_figures(tex, self._ext_priority)
+        if self._build_style == "aastex":
+            aas_numbering = True
+        else:
+            aas_numbering = False
         tex = install_figs(tex, figs, dirname,
-                aas_numbering=False)
+                aas_numbering=aas_numbering,
+                format_priority=self._ext_priority)
         print figs
         return tex
 
@@ -73,7 +88,7 @@ class Package(Command):
             f.write(tex)
 
 
-def discover_figures(tex):
+def discover_figures(tex, ext_priority):
     """Find all figures in the manuscript.
 
     Returns
@@ -91,18 +106,18 @@ def discover_figures(tex):
         opts, path = match
         basename = os.path.splitext(os.path.basename(path))[0]
         figs[basename] = {"path": path,
-                          "exts": _find_exts(path),
+                          "exts": _find_exts(path, ext_priority),
                           "options": opts,
                           "env": ur"\\includegraphics",
                           "num": i}
     return figs
 
 
-def _find_exts(fig_path):
+def _find_exts(fig_path, ext_priority):
     """Return a tuple of all formats for which a figure exists."""
     basepath = os.path.splitext(fig_path)[0]
     has_exts = []
-    for ext in ('pdf', 'eps', 'ps', 'png', 'jpg', 'tif'):
+    for ext in ext_priority:
         p = ".".join((basepath, ext))
         if os.path.exists(p):
             has_exts.append(ext)
@@ -124,13 +139,21 @@ def install_figs(tex, figs, install_dir, aas_numbering=False,
                 full_path = ".".join((os.path.splitext(fig['path'])[0], ext))
                 break
         # copy fig to the build directory
-        install_path = os.path.join(install_dir, os.path.basename(full_path))
+        if aas_numbering:
+            print "using aas_numbering", fig['num']
+            install_path = os.path.join(install_dir,
+                    "f{0:d}.{1}".format(fig['num'], ext))
+        else:
+            print "not using aas_numbering"
+            install_path = os.path.join(install_dir,
+                    os.path.basename(full_path))
+        print install_path
         figs[figname]["installed_path"] = install_path
         shutil.copy(full_path, install_path)
         # update tex by replacing old filename with new.
         old_fig_cmd = ur"{0}{1}{{2}}".format(fig['env'], fig['options'],
             fig['path'])
         new_fig_cmd = ur"{0}{1}{{2}}".format(fig['env'], fig['options'],
-            os.path.basename(os.path.splitext(fig['path'])[0]))
+            os.path.basename(os.path.splitext(fig['installed_path'])[0]))
         tex = re.sub(old_fig_cmd, new_fig_cmd, tex)
     return tex
