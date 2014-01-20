@@ -109,7 +109,7 @@ def discover_figures(tex, ext_priority):
                           "exts": _find_exts(path, ext_priority),
                           "options": opts,
                           "env": ur"\\includegraphics",
-                          "num": i}
+                          "num": i + 1}
     return figs
 
 
