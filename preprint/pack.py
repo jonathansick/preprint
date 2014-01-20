@@ -58,8 +58,11 @@ class Package(Command):
         else:
             print "No", bbl_path
 
-        output_tex_path = os.path.join(dirname,
-                os.path.basename(self.app.options.master))
+        if self._build_style == "aastex":
+            output_tex_path = os.path.join(dirname, "ms.tex")
+        else:
+            output_tex_path = os.path.join(dirname,
+                    os.path.basename(self.app.options.master))
         self._write_tex(tex, output_tex_path)
 
     def _flatten_figures(self, tex, dirname):
