@@ -131,7 +131,6 @@ def install_figs(tex, figs, install_dir, aas_numbering=False,
     """Copy each figure to the build directory and update tex with new path.
     """
     for figname, fig in figs.iteritems():
-        print figname, fig
         if len(fig['exts']) == 0: continue
         # get the priority graphics file type
         for ext in format_priority:
@@ -140,20 +139,23 @@ def install_figs(tex, figs, install_dir, aas_numbering=False,
                 break
         # copy fig to the build directory
         if aas_numbering:
-            print "using aas_numbering", fig['num']
             install_path = os.path.join(install_dir,
-                    "f{0:d}.{1}".format(fig['num'], ext))
+                    u"f{0:d}.{1}".format(fig['num'], ext))
         else:
-            print "not using aas_numbering"
             install_path = os.path.join(install_dir,
                     os.path.basename(full_path))
-        print install_path
         figs[figname]["installed_path"] = install_path
         shutil.copy(full_path, install_path)
         # update tex by replacing old filename with new.
-        old_fig_cmd = ur"{0}{1}{{2}}".format(fig['env'], fig['options'],
-            fig['path'])
-        new_fig_cmd = ur"{0}{1}{{2}}".format(fig['env'], fig['options'],
-            os.path.basename(os.path.splitext(fig['installed_path'])[0]))
-        tex = re.sub(old_fig_cmd, new_fig_cmd, tex)
+        # Note that fig['env'] currently has escaped slash for re; this is
+        # removed here. Might want to think of a convention so it's less kludgy
+        old_fig_cmd = ur"{env}{opts}{{{path}}}".format(
+            env=fig['env'].replace(u"\\\\", u"\\"),
+            opts=fig['options'],
+            path=fig['path'])
+        new_fig_cmd = ur"{env}{opts}{{{path}}}".format(
+            env=fig['env'].replace(u"\\\\", u"\\"),
+            opts=fig['options'],
+            path=os.path.basename(os.path.splitext(install_path)[0]))
+        tex = tex.replace(old_fig_cmd, new_fig_cmd)
     return tex
