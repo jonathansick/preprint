@@ -98,25 +98,35 @@ This pipeline includes:
 
 1. Creating a build directory and copying over just the required manuscript files,
 2. Inlining all inputted latex files,
-3. Moving figures to the root directory and updating tex source,
-4. Deleting comments; don't be a tweet on @OverheardOnAph,
-5. *todo*: Renaming figures to conform to AASTeX if necessary,
-6. *todo*: Making JPEG versions of figures to to fulfil arXiv file size requirements, if necessary,
-7. Copying the ``.bbl`` bibliography or inlining it into the manuscript, as necessary.
+3. Copying the ``.bbl`` bibliography or inlining it into the manuscript, as necessary.
+4. Moving figures to the root directory and updating tex source,
+5. Deleting comments; don't be a tweet on @OverheardOnAph,
+6. Renaming figures to conform to AASTeX if necessary,
+7. *todo*: Making JPEG versions of figures to to fulfil arXiv file size requirements, if necessary,
 
 This command is inspired by Erik Tollerud's `Astropysics package <http://pythonhosted.org/Astropysics/coremods/publication.html>`_, but is designed around regular expressions for text transformation.
 The implementation should thus be easier.
 
 Usage::
 
-    preprint [--master MASTER] pack NAME
+    preprint [--master MASTER] pack NAME [--style STYLE; --exts EXT1, ..., EXTN]
 
     Arguments:
     NAME   Name of the build. Products copied to build/NAME directory.
 
     Optional arguments:
     --master   Name of the root LaTeX file (eg, paper.tex)
+    --exts     File format priority for figures (e.g., ``eps, pdf``)
+    --style    Style for the build (default is ``aastex``, can also be ``arxiv``).
 
+Note that the ``--exts`` option can be used to prefer a certain file format for the build if you maintain both EPS and PDF figure sets.
+For example, to generate a manuscript for a AAS journal, run::
+
+    preprint pack my_aas_build --style aastex --exts eps
+
+And to build for the arxiv, where PDF figures are preferred, run::
+
+    preprint pack my_arxiv_build --style arxiv --exts pdf
 
 =====
 About
