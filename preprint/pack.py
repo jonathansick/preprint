@@ -9,6 +9,7 @@ import os
 import shutil
 import codecs
 import re
+import subprocess
 
 from preprint.textools import inline, remove_comments, inline_bbl
 
@@ -26,11 +27,21 @@ class Package(Command):
             help="Name of packaged manuscript (saved to build/name).")
         parser.add_argument('--style',
             default="aastex",
+            choices=['aastex', 'arxiv'],
             help="Build style (aastex, arxiv).")
         parser.add_argument('--exts',
             nargs='*',
             default=self.app.confs.config('exts'),
             help="Figure extensions to use in order of priority")
+        parser.add_argument('--jpeg',
+            action='store_true',
+            default=False,
+            help="Make JPEG versions of figures if too large (for arxiv)")
+        parser.add_argument('--maxsize',
+            default=2.,
+            type=float,
+            help="Max figure size (MB) before converting to JPEG (for arxiv)")
+        print self.app.confs.config('exts')
         return parser
 
     def take_action(self, parsed_args):
@@ -40,6 +51,7 @@ class Package(Command):
 
         self._build_style = parsed_args.style
         self._ext_priority = parsed_args.exts
+        self._max_size = parsed_args.maxsize
 
         print "_ext_priority", self._ext_priority
 
@@ -50,7 +62,7 @@ class Package(Command):
             root_text = f.read()
         tex = inline(root_text)
         tex = remove_comments(tex)
-        tex = self._flatten_figures(tex, dirname)
+        tex = self._process_figures(tex, dirname)
         if os.path.exists(bbl_path):
             with codecs.open(bbl_path, 'r', encoding='utf-8') as f:
                 bbl_text = f.read()
@@ -65,7 +77,7 @@ class Package(Command):
                     os.path.basename(self.app.options.master))
         self._write_tex(tex, output_tex_path)
 
-    def _flatten_figures(self, tex, dirname):
+    def _process_figures(self, tex, dirname):
         """Discover figures and copy to root of build directory.
         
         Returns
@@ -77,12 +89,15 @@ class Package(Command):
         figs = discover_figures(tex, self._ext_priority)
         if self._build_style == "aastex":
             aas_numbering = True
-        else:
+            maxsize = None
+        elif self._build_style == "arxiv":
             aas_numbering = False
+            maxsize = self._max_size
+
         tex = install_figs(tex, figs, dirname,
                 aas_numbering=aas_numbering,
-                format_priority=self._ext_priority)
-        print figs
+                format_priority=self._ext_priority,
+                max_size=maxsize)
         return tex
 
     def _write_tex(self, tex, path):
@@ -108,8 +123,17 @@ def discover_figures(tex, ext_priority):
     for i, match in enumerate(matches):
         opts, path = match
         basename = os.path.splitext(os.path.basename(path))[0]
+        # Find all formats this file exists in
+        exts = _find_exts(path, ext_priority)
+        # Get file sizes for all variants here
+        _dir = os.path.dirname(path)
+        sizes = []
+        for ext in exts:
+            p = os.path.join(_dir, ".".join((basename, ext)))
+            sizes.append(os.path.getsize(p) / 10. ** 6.)
         figs[basename] = {"path": path,
-                          "exts": _find_exts(path, ext_priority),
+                          "exts": exts,
+                          "size_mb": sizes,
                           "options": opts,
                           "env": ur"\\includegraphics",
                           "num": i + 1}
@@ -130,14 +154,22 @@ def _find_exts(fig_path, ext_priority):
 
 
 def install_figs(tex, figs, install_dir, aas_numbering=False,
-        format_priority=('pdf', 'eps', 'ps', 'png', 'jpg', 'tif')):
+        format_priority=('pdf', 'eps', 'ps', 'png', 'jpg', 'tif'),
+        max_size=None):
     """Copy each figure to the build directory and update tex with new path.
+
+    Parameters
+    ----------
+    max_size : float
+        Maximum size for a figure before converting it into a JPEG.
+        If ``None``, no conversions are attempted.
     """
     for figname, fig in figs.iteritems():
         if len(fig['exts']) == 0: continue
         # get the priority graphics file type
         for ext in format_priority:
             if ext in fig['exts']:
+                figsize = fig['size_mb'][fig['exts'].index(ext)]
                 full_path = ".".join((os.path.splitext(fig['path'])[0], ext))
                 break
         # copy fig to the build directory
@@ -149,6 +181,8 @@ def install_figs(tex, figs, install_dir, aas_numbering=False,
                     os.path.basename(full_path))
         figs[figname]["installed_path"] = install_path
         shutil.copy(full_path, install_path)
+        if max_size and figsize > max_size:
+            rasterize_figure(install_path)
         # update tex by replacing old filename with new.
         # Note that fig['env'] currently has escaped slash for re; this is
         # removed here. Might want to think of a convention so it's less kludgy
@@ -162,3 +196,13 @@ def install_figs(tex, figs, install_dir, aas_numbering=False,
             path=os.path.basename(os.path.splitext(install_path)[0]))
         tex = tex.replace(old_fig_cmd, new_fig_cmd)
     return tex
+
+
+def rasterize_figure(original_path):
+    """Make a JPEG version of a figure, deleting the original."""
+    jpg_path = os.path.splitext(original_path)[0] + ".jpg"
+    subprocess.call(
+        "convert -density 300 -trim -quality 80 {path} {jpgpath}".format(
+            path=original_path, jpgpath=jpg_path),
+        shell=True)
+    os.remove(original_path)

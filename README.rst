@@ -5,8 +5,14 @@ preprint
 *Tools for preparing astrophysics papers.* Preprint lets you automatically compile, typeset document differences and package the manuscript for publication.
 
 Installation requires `cliff <https://cliff.readthedocs.org/en/latest/>`_, the `watchdog <https://pypi.python.org/pypi/watchdog>`_ package, the `GitPython >=0.3 <https://pypi.python.org/pypi/GitPython/0.3.2.RC1>`_ package, and a recent version of setuptools.
-To install ``preprint``, run ``python setup.py install``.
-Then try ``preprint --help`` for more info.
+
+To install from PyPI:
+
+    pip install preprint
+
+Or to install from source, check the code out and run ``python setup.py install``.
+
+After installing, try ``preprint --help`` for more info.
 
 Preprint currently supports the following commands (see below for a reference):
 
@@ -102,7 +108,7 @@ This pipeline includes:
 4. Moving figures to the root directory and updating tex source,
 5. Deleting comments; don't be a tweet on @OverheardOnAph,
 6. Renaming figures to conform to AASTeX if necessary,
-7. *todo*: Making JPEG versions of figures to to fulfil arXiv file size requirements, if necessary,
+7. Making JPEG versions of figures to to fulfil arXiv file size requirements, if necessary. This requires [imagemagick](http://www.imagemagick.org/script/index.php).
 
 This command is inspired by Erik Tollerud's `Astropysics package <http://pythonhosted.org/Astropysics/coremods/publication.html>`_, but is designed around regular expressions for text transformation.
 The implementation should thus be easier.
@@ -118,6 +124,8 @@ Usage::
     --master   Name of the root LaTeX file (eg, paper.tex)
     --exts     File format priority for figures (e.g., ``eps, pdf``)
     --style    Style for the build (default is ``aastex``, can also be ``arxiv``).
+    --maxsize  Maximum size of figure in MB before compressing into jpg (for
+               ``arxiv``). Default is 2.5 MB.
 
 Note that the ``--exts`` option can be used to prefer a certain file format for the build if you maintain both EPS and PDF figure sets.
 For example, to generate a manuscript for a AAS journal, run::
@@ -132,7 +140,7 @@ And to build for the arxiv, where PDF figures are preferred, run::
 About
 =====
 
-`Preprint is developed on Github <https://github.com/jonathansick/preprint>`_. Contributions and suggestions are welcome.
+`Preprint is developed on GitHub <https://github.com/jonathansick/preprint>`_. Contributions and suggestions are welcome.
 
 Copyright 2014 Jonathan Sick, @jonathansick
 
