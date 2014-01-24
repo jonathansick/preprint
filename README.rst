@@ -108,7 +108,7 @@ This pipeline includes:
 4. Moving figures to the root directory and updating tex source,
 5. Deleting comments; don't be a tweet on @OverheardOnAph,
 6. Renaming figures to conform to AASTeX if necessary,
-7. Making JPEG versions of figures to to fulfil arXiv file size requirements, if necessary. This requires [imagemagick](http://www.imagemagick.org/script/index.php).
+7. Making JPEG versions of figures to to fulfil arXiv file size requirements, if necessary. This requires `imagemagick <http://www.imagemagick.org/script/index.php>`_.
 
 This command is inspired by Erik Tollerud's `Astropysics package <http://pythonhosted.org/Astropysics/coremods/publication.html>`_, but is designed around regular expressions for text transformation.
 The implementation should thus be easier.
