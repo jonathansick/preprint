@@ -5,12 +5,32 @@ PROJECT = 'preprint'
 # Change docs/sphinx/conf.py too!
 VERSION = '0.1'
 
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Command
+
+# from setuptools.core import setup, Command
+# you can also import from setuptools
+
+
+class PyTest(Command):
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import sys,subprocess
+        errno = subprocess.call([sys.executable, 'runtests.py'])
+        raise SystemExit(errno)
+
 
 try:
     long_description = open('README.rst', 'rt').read()
 except IOError:
     long_description = ''
+
 
 setup(
     name=PROJECT,
@@ -37,11 +57,13 @@ setup(
     scripts=[],
 
     provides=[],
-    install_requires=['cliff', 'watchdog', 'GitPython'],
+    install_requires=['cliff', 'watchdog', 'GitPython', 'pytest'],
 
     namespace_packages=[],
     packages=find_packages(),
     include_package_data=True,
+
+    cmdclass = {'test': PyTest},
 
     entry_points={
         'console_scripts': [
