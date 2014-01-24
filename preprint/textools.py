@@ -45,27 +45,6 @@ def inline_bbl(root_tex, bbl_tex):
     return result
 
 
-def inline(root_text):
-    """Inline all input latex files. The inlining is accomplished
-    recursively.
-
-    All files are opened as UTF-8 unicode files.
-
-    Parameters
-    ----------
-    root_txt : unicode
-        Text to process (and include in-lined files).
-
-    Returns
-    -------
-    txt : unicode
-        Text with referenced files included.
-    """
-    input_pattern = re.compile(ur'\\input{(.*)}', re.UNICODE)
-    result = input_pattern.sub(_sub_line, root_text)
-    return result
-
-
 def _sub_line(match):
     """Function to be used with re.sub to inline files for each match."""
     fname = match.group(1)
@@ -78,6 +57,30 @@ def _sub_line(match):
     # Recursively inline files
     included_text = inline(included_text)
     return included_text
+
+
+def inline(root_text, replacer=_sub_line):
+    """Inline all input latex files. The inlining is accomplished
+    recursively.
+
+    All files are opened as UTF-8 unicode files.
+
+    Parameters
+    ----------
+    root_txt : unicode
+        Text to process (and include in-lined files).
+    replacer : function
+        Function called by :func:`re.sub` to replace ``\input`` expressions
+        with a latex document. Changeable only for testing purposes.
+
+    Returns
+    -------
+    txt : unicode
+        Text with referenced files included.
+    """
+    input_pattern = re.compile(ur'\\input{(.*)}', re.UNICODE)
+    result = input_pattern.sub(replacer, root_text)
+    return result
 
 
 def inline_blob(commit_ref, root_text):
