@@ -2,8 +2,6 @@
 # encoding: utf-8
 """
 Manager for configuration defaults.
-
-TODO change to a JSON file since we need lists.
 """
 
 import os
@@ -24,20 +22,26 @@ class Configurations(object):
     each command line option. Thus each command ultimatly gets the
     final configuration state from the argparser.
 
-    An example json file, named "preprints.json":
+    An example json file, named "preprint.json":
     
     ::
         {
             "master": "skysub.tex",
             "exts": ["tex", "eps", "pdf"],
-            "cmd": "make"
+            "cmd": "latexmk -f -pdf -bibtex-cond {{master}}"
         }
+
+
+    *Notes on the ``cmd`` option:* this open accepts a ``master`` template
+    variable that will be replaced with the value of the ``master``
+    configuration variable. This can be used to tell the appropriate latex
+    build command what the master tex file is (see example above).
     """
 
     _DEFAULTS = {
         "master": "paper.tex",
         "exts": ['tex', 'pdf', 'eps'],
-        "cmd": "make"
+        "cmd": "latexmk -f -pdf -bibtex-cond {{master}}"
         }
 
     def __init__(self):
@@ -54,7 +58,10 @@ class Configurations(object):
 
     def config(self, name):
         """Get the configuration."""
-        return self._confs[name]
+        if name == "cmd":
+            return self._confs['cmd'].format(master=self._confs['master'])
+        else:
+            return self._confs[name]
 
 
 if __name__ == '__main__':

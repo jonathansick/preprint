@@ -35,10 +35,13 @@ Here is an example of its format::
     { 
         "master": "paper.tex",
         "exts": ['tex', 'pdf', 'eps'],
-        "cmd": "make"
+        "cmd": "latexmk -f -pdf -bibtex-cond {{master}}"
     }
 
 If set in ``preprint.json``, any command line setting of the same name does not need to repeated.
+
+Note that the ``cmd`` command, which provides the latex build command, includes a ``master`` variable.
+This variable will take the value of the ``master`` configuration value, and thus custom latex compilation commands can be flexibly given the name of the main tex file.
 
 =================
 Command Reference
@@ -56,7 +59,7 @@ Usage::
     Optional arguments:
     --master   Name of the root LaTeX file (eg, paper.tex)
     --exts     List of file extensions (defaults to `pdf eps tex`)
-    --cmd      Name of command to run when a change occurs (defaults to `make`)
+    --cmd      Name of command to run when a change occurs
     --diff     Run a latexdiff compile against the given commit SHA from the git repository (HEAD if blank).
 
 For example, to continuously compile the document whenever ``.tex`` or figures have changed, and assuming you've setup a ``preprint.json`` file with the name of your master document, just run::
