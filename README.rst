@@ -34,8 +34,8 @@ Here is an example of its format::
 
     { 
         "master": "paper.tex",
-        "exts": ['tex', 'pdf', 'eps'],
-        "cmd": "latexmk -f -pdf -bibtex-cond {{master}}"
+        "exts": ["tex", "pdf", "eps"],
+        "cmd": "latexmk -f -pdf -bibtex-cond {master}"
     }
 
 If set in ``preprint.json``, any command line setting of the same name does not need to repeated.

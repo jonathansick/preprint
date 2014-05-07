@@ -28,7 +28,7 @@ class Configurations(object):
         {
             "master": "skysub.tex",
             "exts": ["tex", "eps", "pdf"],
-            "cmd": "latexmk -f -pdf -bibtex-cond {{master}}"
+            "cmd": "latexmk -f -pdf -bibtex-cond {master}"
         }
 
 
@@ -40,9 +40,8 @@ class Configurations(object):
 
     _DEFAULTS = {
         "master": "paper.tex",
-        "exts": ['tex', 'pdf', 'eps'],
-        "cmd": "latexmk -f -pdf -bibtex-cond {{master}}"
-        }
+        "exts": ["tex", "pdf", "eps"],
+        "cmd": "latexmk -f -pdf -bibtex-cond {master}"}
 
     def __init__(self):
         super(Configurations, self).__init__()
