@@ -16,6 +16,7 @@ After installing, try ``preprint --help`` for more info.
 
 Preprint currently supports the following commands (see below for a reference):
 
+- ``preprint make`` to do a one-off compilation of the paper,
 - ``preprint watch`` to automatically compile the paper if source is changed,
 - ``preprint diff`` to run ``latexdiff`` against a commit in Git,
 - ``preprint pack`` to package the document for journals or the arXiv.
@@ -46,6 +47,25 @@ This variable will take the value of the ``master`` configuration value, and thu
 =================
 Command Reference
 =================
+
+make
+----
+
+``preprint`` will perform a one-off compilation of your paper.
+
+Usage::
+
+    preprint [--master MASTER] make [--cmd CMD]
+
+    Optional arguments:
+    --master   Name of the root LaTeX file (eg, paper.tex)
+    --cmd      Name of command to run when a change occurs
+
+
+If ``preprint.json`` is set, you can just run::
+
+    preprint make
+
 
 watch
 -----

@@ -21,7 +21,8 @@ class PyTest(Command):
         pass
 
     def run(self):
-        import sys,subprocess
+        import sys
+        import subprocess
         errno = subprocess.call([sys.executable, 'runtests.py'])
         raise SystemExit(errno)
 
@@ -63,13 +64,14 @@ setup(
     packages=find_packages(),
     include_package_data=True,
 
-    cmdclass = {'test': PyTest},
+    cmdclass={'test': PyTest},
 
     entry_points={
         'console_scripts': [
             'preprint = preprint.main:main'
         ],
         'preprint.commands': [
+            'make = preprint.make:Make',
             'watch = preprint.watch:Watch',
             'diff = preprint.latexdiff:Diff',
             'pack = preprint.pack:Package',
