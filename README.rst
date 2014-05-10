@@ -6,11 +6,13 @@ preprint
 
 Installation requires `cliff <https://cliff.readthedocs.org/en/latest/>`_, the `watchdog <https://pypi.python.org/pypi/watchdog>`_ package, the `GitPython >=0.3 <https://pypi.python.org/pypi/GitPython/0.3.2.RC1>`_ package, and a recent version of setuptools.
 
-To install from PyPI:
+To install from PyPI::
 
     pip install preprint
 
-Or to install from source, check the code out and run ``python setup.py install``.
+Or to install from source, check the code out and run::
+
+    python setup.py install
 
 After installing, try ``preprint --help`` for more info.
 
@@ -21,13 +23,13 @@ Preprint currently supports the following commands (see below for a reference):
 - ``preprint diff`` to run ``latexdiff`` against a commit in Git,
 - ``preprint pack`` to package the document for journals or the arXiv.
 
-Check the `Github Issues <https://github.com/jonathansick/preprint/issues>`_ to submit additional ideas.
+Check the `GitHub Issues <https://github.com/jonathansick/preprint/issues>`_ to submit additional ideas.
 
 ====================================
 Configuration System / preprint.json
 ====================================
 
-``preprint`` configurations are determined from (in order of increasing precedence): internal defaults, a project-specific JSON file, command line arguments.
+``preprint`` configurations are determined from (in order of increasing precedence): internal defaults, a project-specific JSON file, and command line arguments.
 
 The JSON configurations file makes ``preprint`` much easier to use.
 The configuration file should be named ``preprint.json``, and be located in the root directory of the LaTeX project.
@@ -51,7 +53,7 @@ Command Reference
 make
 ----
 
-``preprint`` will perform a one-off compilation of your paper.
+``preprint make`` will perform a one-off compilation of your paper.
 
 Usage::
 
@@ -62,7 +64,7 @@ Usage::
     --cmd      Name of command to run when a change occurs
 
 
-If ``preprint.json`` is set, you can just run::
+If ``preprint.json`` is setup, you can just run::
 
     preprint make
 
@@ -93,7 +95,7 @@ To continuously run a latexdiff-based compile, showing all changes you've made a
 The document will be saved to ``build/PAPER_NAME_diff.pdf``.
 This is a nice way of keeping track of what you're doing.
 
-Finally, to continuously run a latediff-based compile against an arbitrary commit in your git history, just copy the commit SHA fragment (say, ``b91688d``) and run::
+Finally, to continuously run a latexdiff-based compile against an arbitrary commit in your git history, just copy the commit SHA fragment (say, ``b91688d``) and run::
 
     preprint watch --diff b91688d
 
@@ -131,7 +133,7 @@ This pipeline includes:
 4. Moving figures to the root directory and updating tex source,
 5. Deleting comments; don't be a tweet on @OverheardOnAph,
 6. Renaming figures to conform to AASTeX if necessary,
-7. Making JPEG versions of figures to to fulfil arXiv file size requirements, if necessary. This requires `imagemagick <http://www.imagemagick.org/script/index.php>`_.
+7. Making JPEG versions of figures to to fulfill arXiv file size requirements, if necessary. This requires `imagemagick <http://www.imagemagick.org/script/index.php>`_.
 
 This command is inspired by Erik Tollerud's `Astropysics package <http://pythonhosted.org/Astropysics/coremods/publication.html>`_, but is designed around regular expressions for text transformation.
 The implementation should thus be easier.
@@ -163,7 +165,9 @@ And to build for the arxiv, where PDF figures are preferred, run::
 About
 =====
 
-`Preprint is developed on GitHub <https://github.com/jonathansick/preprint>`_. Contributions and suggestions are welcome.
+`Preprint is developed on GitHub <https://github.com/jonathansick/preprint>`_.
+Contributions and suggestions are welcome;
+read `the CONTRIBUTING guidelines <https://github.com/jonathansick/preprint/blob/master/CONTRIBUTING.md>`_ for instructions on how to help.
 
 Copyright 2014 Jonathan Sick, @jonathansick
 
