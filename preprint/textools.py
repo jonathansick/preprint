@@ -131,8 +131,8 @@ def remove_comments(tex):
     tex : unicode
         The manuscript without comments.
     """
-    # Expression via http://stackoverflow.com/a/13365225
-    return re.sub(ur'[^\\]%.*', ur'', tex)
+    # Expression via http://stackoverflow.com/a/13365453
+    return re.sub(ur'(?<!\\)%.*', ur'', tex)
 
 
 def main():
