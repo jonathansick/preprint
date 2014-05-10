@@ -24,9 +24,11 @@ class Diff(Command):
 
     def get_parser(self, prog_name):
         parser = super(Diff, self).get_parser(prog_name)
-        parser.add_argument('prev_commit',
+        parser.add_argument(
+            'prev_commit',
             help="Commit SHA to compare HEAD against.")
-        parser.add_argument('-n', '--name',
+        parser.add_argument(
+            '-n', '--name',
             default=None,
             help="Name of the difference file.")
         return parser
@@ -38,8 +40,10 @@ class Diff(Command):
         else:
             name = parsed_args.name
 
-        git_diff_pipeline(name, self.app.options.master,
-                self.app.options.prev_commit)
+        git_diff_pipeline(
+            name,
+            self.app.options.master,
+            parsed_args.prev_commit)
 
 
 def git_diff_pipeline(output_name, master_path, prev_commit):
@@ -49,15 +53,12 @@ def git_diff_pipeline(output_name, master_path, prev_commit):
 
     # Run latexmk
     diff_path = os.path.splitext(output_name)[0]
-    ldiff_cmd = "latexdiff {prev} {current} > {diff}.tex".format(
-            prev=prev_path,
-            current=current_path,
-            diff=diff_path)
+    ldiff_cmd = "latexdiff {prev} {current} > {diff}.tex".\
+        format(prev=prev_path, current=current_path, diff=diff_path)
     subprocess.call(ldiff_cmd, shell=True)
 
     # Compile the diff document with latexmk
-    ltmk_cmd = "latexmk -f -pdf -bibtex-cond {0}.tex".format(
-            diff_path)
+    ltmk_cmd = "latexmk -f -pdf -bibtex-cond {0}.tex".format(diff_path)
     subprocess.call(ltmk_cmd, shell=True)
 
     # Copy to build directory
@@ -68,8 +69,7 @@ def git_diff_pipeline(output_name, master_path, prev_commit):
         shutil.move(pdf_path, os.path.join("build", pdf_path))
 
     # Clean up
-    ltmk_cmd = "latexmk -f -pdf -bibtex-cond -c {0}.tex".format(
-            diff_path)
+    ltmk_cmd = "latexmk -f -pdf -bibtex-cond -c {0}.tex".format(diff_path)
     subprocess.call(ltmk_cmd, shell=True)
     build_exts = ['Notes.bib', '.bbl', '.tex']
     for ext in build_exts:
