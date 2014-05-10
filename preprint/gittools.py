@@ -16,8 +16,9 @@ def read_git_blob(commit_ref, path):
     repo = git.Repo('.')
     tree = repo.tree(commit_ref)
     dirname, fname = os.path.split(path)
+    text = None
     if dirname == '':
-        text =_read_blob(tree, fname)
+        text = _read_blob(tree, fname)
     else:
         components = path.split(os.sep)
         text = _read_blob_in_tree(tree, components)

@@ -128,7 +128,7 @@ pack
 This pipeline includes:
 
 1. Creating a build directory and copying over just the required manuscript files,
-2. Inlining all inputted latex files,
+2. Inlining all inputted latex files (either with ``\input{}`` or ``\InputIfFileExists`` syntax),
 3. Copying the ``.bbl`` bibliography or inlining it into the manuscript, as necessary.
 4. Moving figures to the root directory and updating tex source,
 5. Deleting comments; don't be a tweet on @OverheardOnAph,

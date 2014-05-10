@@ -18,9 +18,17 @@ blobs in the git tree.
 - :func:`inline_blob` to inline text from files in the git tree.
 """
 
+import os
 import re
 import codecs
 from preprint.gittools import read_git_blob
+
+
+bib_pattern = re.compile(ur'\\bibliography{.*}', re.UNICODE)
+input_pattern = re.compile(ur'\\input{(.*)}', re.UNICODE)
+input_ifexists_pattern = re.compile(
+    ur'\\InputIfFileExists{(.*)}{(.*)}{(.*)}',
+    re.UNICODE)
 
 
 def inline_bbl(root_tex, bbl_tex):
@@ -40,7 +48,6 @@ def inline_bbl(root_tex, bbl_tex):
         Text with bibliography included.
     """
     bbl_tex = bbl_tex.replace(u'\\', u'\\\\')
-    bib_pattern = re.compile(ur'\\bibliography{.*}', re.UNICODE)
     result = bib_pattern.sub(bbl_tex, root_tex)
     return result
 
@@ -59,7 +66,30 @@ def _sub_line(match):
     return included_text
 
 
-def inline(root_text, replacer=_sub_line):
+def _sub_line_ifexists(match):
+    """Function to be used with re.sub for the input_ifexists_pattern."""
+    fname = match.group(1)
+    if os.path.exists(fname):
+        if not fname.endswith('.tex'):
+            full_fname = ".".join((fname, 'tex'))
+        else:
+            full_fname = fname
+        with codecs.open(full_fname, 'r', encoding='utf-8') as f:
+            included_text = f.read()
+        # Append extra info after input
+        included_text = "\n".join((included_text, match.group(2)))
+    else:
+        # Use the fall-back clause in InputIfExists
+        included_text = match.group(3)
+
+    # Recursively inline files
+    included_text = inline(included_text)
+    return included_text
+
+
+def inline(root_text,
+           replacer=_sub_line,
+           ifexists_replacer=_sub_line_ifexists):
     """Inline all input latex files. The inlining is accomplished
     recursively.
 
@@ -72,14 +102,18 @@ def inline(root_text, replacer=_sub_line):
     replacer : function
         Function called by :func:`re.sub` to replace ``\input`` expressions
         with a latex document. Changeable only for testing purposes.
+    ifexists_replacer : function
+        Function called by :func:`re.sub` to replace ``\InputIfExists``
+        expressions with a latex document. Changeable only for
+        testing purposes.
 
     Returns
     -------
     txt : unicode
         Text with referenced files included.
     """
-    input_pattern = re.compile(ur'\\input{(.*)}', re.UNICODE)
     result = input_pattern.sub(replacer, root_text)
+    result = input_ifexists_pattern.sub(ifexists_replacer, result)
     return result
 
 
@@ -110,11 +144,38 @@ def inline_blob(commit_ref, root_text):
         else:
             full_fname = fname
         included_text = read_git_blob(commit_ref, full_fname)
+        if included_text is None:
+            # perhaps file is not in VC
+            # FIXME need to deal possibility is does not exist there either
+            with codecs.open(full_fname, 'r', encoding='utf-8') as f:
+                included_text = f.read()
         # Recursively inline files
         included_text = inline_blob(commit_ref, included_text)
         return included_text
-    input_pattern = re.compile(ur'\\input{(.*)}', re.UNICODE)
+
+    def _sub_blob_ifexists(match):
+        """Function to be used with re.sub for the input_ifexists_pattern."""
+        fname = match.group(1)
+        if not fname.endswith('.tex'):
+            full_fname = ".".join((fname, 'tex'))
+        else:
+            full_fname = fname
+
+        included_text = read_git_blob(commit_ref, full_fname)
+        if included_text is not None:
+            # Append extra info after input
+            included_text = "\n".join((included_text, match.group(2)))
+
+        if included_text is None:
+            # Use the fall-back clause in InputIfExists
+            included_text = match.group(3)
+
+        # Recursively inline files
+        included_text = inline_blob(commit_ref, included_text)
+        return included_text
+
     result = input_pattern.sub(_sub_blob, root_text)
+    result = input_ifexists_pattern.sub(_sub_blob_ifexists, result)
     return result
 
 
