@@ -7,6 +7,9 @@ from cliff.commandmanager import CommandManager
 from .config import Configurations
 
 
+VERSION = "0.2.dev"
+
+
 class PreprintApp(App):
 
     log = logging.getLogger(__name__)
@@ -15,9 +18,8 @@ class PreprintApp(App):
     def __init__(self):
         super(PreprintApp, self).__init__(
             description='Tools for writing latex papers',
-            version='0.1',
-            command_manager=CommandManager('preprint.commands'),
-            )
+            version=VERSION,
+            command_manager=CommandManager('preprint.commands'))
 
     def initialize_app(self, argv):
         self.log.debug('initialize_app')

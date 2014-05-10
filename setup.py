@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 
-PROJECT = 'preprint'
-
-# Change docs/sphinx/conf.py too!
-VERSION = '0.1'
-
+import os
+import re
 from setuptools import setup, find_packages, Command
 
 # from setuptools.core import setup, Command
@@ -27,15 +24,28 @@ class PyTest(Command):
         raise SystemExit(errno)
 
 
+def rel_path(path):
+    return os.path.join(os.path.dirname(__file__), path)
+
+
+def get_version():
+    with open(rel_path(os.path.join("preprint", "main.py"))) as f:
+        for line in f:
+            if line.startswith("VERSION"):
+                version = re.findall(r'\"(.+?)\"', line)[0]
+                return version
+    return "0.0.0.dev"
+
+
 try:
-    long_description = open('README.rst', 'rt').read()
+    long_description = open(rel_path('README.rst'), 'rt').read()
 except IOError:
     long_description = ''
 
 
 setup(
-    name=PROJECT,
-    version=VERSION,
+    name='preprint',
+    version=get_version(),
 
     description='Tools for writing latex papers',
     long_description=long_description,
