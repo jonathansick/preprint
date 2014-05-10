@@ -9,6 +9,7 @@ from watchdog.events import FileSystemEventHandler
 from cliff.command import Command
 
 from preprint.latexdiff import git_diff_pipeline
+from .vc import run_vc
 
 
 class Watch(Command):
@@ -18,14 +19,17 @@ class Watch(Command):
 
     def get_parser(self, prog_name):
         parser = super(Watch, self).get_parser(prog_name)
-        parser.add_argument('--exts',
+        parser.add_argument(
+            '--exts',
             nargs='*',
             default=self.app.confs.config('exts'),
             help="File extensions to look for")
-        parser.add_argument('--cmd',
+        parser.add_argument(
+            '--cmd',
             default=self.app.confs.config('cmd'),
             help="Command to run on changes")
-        parser.add_argument('--diff',
+        parser.add_argument(
+            '--diff',
             nargs='?',
             const='HEAD',
             default=None,
@@ -34,13 +38,14 @@ class Watch(Command):
 
     def take_action(self, parsed_args):
         ignore = (os.path.splitext(self.app.options.master)[0] + ".pdf",
-            'build', '_current.tex', '_prev.tex')
+                  'build', '_current.tex', '_prev.tex')
         if parsed_args.diff is None:
-            handler = RegularChangeHandler(parsed_args.cmd, parsed_args.exts,
-                    ignore)
+            handler = RegularChangeHandler(
+                parsed_args.cmd, parsed_args.exts, ignore)
         else:
-            handler = DiffChangeHandler(self.app.options.master,
-                    parsed_args.diff, parsed_args.exts, ignore)
+            handler = DiffChangeHandler(
+                self.app.options.master, parsed_args.diff, parsed_args.exts,
+                ignore)
         self._watch(handler)
 
     def _watch(self, handler):
@@ -86,6 +91,7 @@ class RegularChangeHandler(BaseChangeHandler):
 
     def run_compile(self):
         """Run a compilation."""
+        run_vc()
         subprocess.call(self._cmd, shell=True)
 
 
@@ -96,12 +102,13 @@ class DiffChangeHandler(BaseChangeHandler):
         self._master = master_path
         self._prev_commit = prev_commit
         self._output_name = "{0}_diff".format(
-                os.path.splitext(self._master)[0])
+            os.path.splitext(self._master)[0])
         # Hack the ignore list to include the output path
         self._ignores = list(ignores)
         self._ignores.append(self._output_name)
 
     def run_compile(self):
         """Run a latexdiff+compile."""
-        git_diff_pipeline(self._output_name, self._master,
+        git_diff_pipeline(
+            self._output_name, self._master,
             self._prev_commit)
