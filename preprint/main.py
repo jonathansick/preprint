@@ -7,7 +7,7 @@ from cliff.commandmanager import CommandManager
 from .config import Configurations
 
 
-VERSION = "0.2.dev"
+VERSION = "0.2"
 
 
 class PreprintApp(App):
@@ -26,7 +26,8 @@ class PreprintApp(App):
 
     def build_option_parser(self, *args):
         parser = super(PreprintApp, self).build_option_parser(*args)
-        parser.add_argument('--master',
+        parser.add_argument(
+            '--master',
             default=self.confs.config('master'),
             help='Name of master tex file')
         return parser
