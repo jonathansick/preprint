@@ -81,6 +81,7 @@ setup(
             'preprint = preprint.main:main'
         ],
         'preprint.commands': [
+            'init = preprint.init:Init',
             'make = preprint.make:Make',
             'watch = preprint.watch:Watch',
             'diff = preprint.latexdiff:Diff',

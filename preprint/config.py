@@ -62,6 +62,10 @@ class Configurations(object):
         else:
             return self._confs[name]
 
+    @property
+    def default_dict(self):
+        return dict(self._DEFAULTS)
+
 
 if __name__ == '__main__':
     conf = Configurations()

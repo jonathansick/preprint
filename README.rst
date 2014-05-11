@@ -5,6 +5,7 @@ preprint
 *Tools for preparing astrophysics papers.* Preprint lets you automatically compile, typeset document differences and package the manuscript for publication.
 
 Installation requires `cliff <https://cliff.readthedocs.org/en/latest/>`_, the `watchdog <https://pypi.python.org/pypi/watchdog>`_ package, the `GitPython >=0.3 <https://pypi.python.org/pypi/GitPython/0.3.2.RC1>`_ package, and a recent version of setuptools.
+Preprint also works well with `latexmk <http://users.phys.psu.edu/~collins/software/latexmk-jcc/>`_ for compiling latex, and `vc <http://www.ctan.org/pkg/vc>`_ for adding version control meta data to compiled documents.
 
 To install from PyPI::
 
@@ -22,8 +23,22 @@ Preprint currently supports the following commands (see below for a reference):
 - ``preprint watch`` to automatically compile the paper if source is changed,
 - ``preprint diff`` to run ``latexdiff`` against a commit in Git,
 - ``preprint pack`` to package the document for journals or the arXiv.
+- ``preprint init`` to setup your project with ``preprint.json`` configurations.
 
 Check the `GitHub Issues <https://github.com/jonathansick/preprint/issues>`_ to submit additional ideas.
+
+===================
+A taste of preprint
+===================
+
+Preprint is pretty easy to use.
+Here's a few commands to give a flavour of what it can do.::
+
+    preprint init  # this is all the setup you need
+    preprint make  # compiles the doc according to your compile command
+    preprint watch --diff 8a42f2b  # live-updating latex diff to git history
+    preprint pack my_paper --style arxiv  # pack it up for arXiv submission
+
 
 ====================================
 Configuration System / preprint.json
@@ -31,8 +46,12 @@ Configuration System / preprint.json
 
 ``preprint`` configurations are determined from (in order of increasing precedence): internal defaults, a project-specific JSON file, and command line arguments.
 
-The JSON configurations file makes ``preprint`` much easier to use.
-The configuration file should be named ``preprint.json``, and be located in the root directory of the LaTeX project.
+To create a ``preprint.json`` configuration file for your project, from your paper's directory simply run::
+
+    preprint init
+
+It will automatically find the root latex file for your paper.
+You can open ``preprint.json`` to take a look at its format and modify the configurations further.
 Here is an example of its format::
 
     { 
@@ -49,6 +68,18 @@ This variable will take the value of the ``master`` configuration value, and thu
 =================
 Command Reference
 =================
+
+init
+----
+
+``preprint init`` will create a default ``preprint.json`` configuration file for your project.
+
+Usage::
+
+    preprint init
+
+After running, take a look at ``preprint.json`` to edit the configurations.
+See *'Configuration System / preprint.json'* (above) for more information.
 
 make
 ----
