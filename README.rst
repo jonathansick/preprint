@@ -32,11 +32,11 @@ A taste of preprint
 ===================
 
 Preprint is pretty easy to use.
-Here's a few commands to give a flavour of what it can do.::
+Here's a few commands to give a flavour of what it can do::
 
     preprint init  # this is all the setup you need
     preprint make  # compiles the doc according to your compile command
-    preprint watch --diff 8a42f2b  # live-updating latex diff to git history
+    preprint watch --diff 8a42f2b  # live-updating latex diff against git history
     preprint pack my_paper --style arxiv  # pack it up for arXiv submission
 
 
@@ -62,8 +62,25 @@ Here is an example of its format::
 
 If set in ``preprint.json``, any command line setting of the same name does not need to repeated.
 
-Note that the ``cmd`` command, which provides the latex build command, includes a ``master`` variable.
-This variable will take the value of the ``master`` configuration value, and thus custom latex compilation commands can be flexibly given the name of the main tex file.
+List of Configurations
+----------------------
+
+master
+  (type: string) Name of latex document to be compiled (or the root latex document containing `\documentclass`).
+  Defaults to ``'article.tex'``, but ``preprint init`` will set this for you.
+
+exts
+  (type: list of strings) List of file extensions used by the ``watch`` command.
+  If any file with this extension in changed in the project, a compile will be triggered by ``preprint watch``.
+  This setting is also used by ``preprint pack`` to figure out your preferences for figure file types.
+  For example, ``["tex", "pdf", "eps"]`` will try to include ``pdf`` figures before falling back to ``eps`` files, while ``["tex", "eps", "pdf"]`` will have the opposite behavior.
+  Defaults to ``["tex", "pdf", "eps"]``.
+
+cmd
+  (type: string) The command to run when making a document.
+  This is used by ``preprint make`` and ``preprint watch`` (``preprint diff`` and ``preprint watch --diff`` will always use latexmk).
+  The command string can include ``{master}`` to interpolate the path of the master tex file.
+  Defaults to ``"latexmk -f -pdf -bibtex-cond {master}"``.
 
 =================
 Command Reference
