@@ -110,7 +110,6 @@ def inline_prev(commit_ref, root_tex):
 def get_n_commits():
     """Count commits in a repo from HEAD."""
     repo = git.Repo(".")
-    print "HEAD", repo.head.commit.hexsha
     commits = list(repo.iter_commits())
     n = len(commits)
     return n

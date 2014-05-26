@@ -50,6 +50,7 @@ class Configurations(object):
         if os.path.exists("preprint.json"):
             with open("preprint.json", 'r') as f:
                 self._confs.update(json.load(f))
+        self._sanitize_path('master')
 
     def default(self, name):
         """Get the default value for the named config, given the section."""
@@ -65,6 +66,14 @@ class Configurations(object):
     @property
     def default_dict(self):
         return dict(self._DEFAULTS)
+
+    def _sanitize_path(self, key):
+        """Sanitize the path of a configuration given `key`."""
+        p = self._confs[key]
+        p = os.path.expandvars(os.path.expanduser(p))
+        if os.path.dirname(p) == ".":
+            p = os.path.basename(p)
+        self._confs[key] = p
 
 
 if __name__ == '__main__':
