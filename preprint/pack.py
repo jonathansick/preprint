@@ -23,25 +23,29 @@ class Package(Command):
 
     def get_parser(self, prog_name):
         parser = super(Package, self).get_parser(prog_name)
-        parser.add_argument('name',
+        parser.add_argument(
+            'name',
             help="Name of packaged manuscript (saved to build/name).")
-        parser.add_argument('--style',
+        parser.add_argument(
+            '--style',
             default="aastex",
             choices=['aastex', 'arxiv'],
             help="Build style (aastex, arxiv).")
-        parser.add_argument('--exts',
+        parser.add_argument(
+            '--exts',
             nargs='*',
             default=self.app.confs.config('exts'),
             help="Figure extensions to use in order of priority")
-        parser.add_argument('--jpeg',
+        parser.add_argument(
+            '--jpeg',
             action='store_true',
             default=False,
             help="Make JPEG versions of figures if too large (for arxiv)")
-        parser.add_argument('--maxsize',
+        parser.add_argument(
+            '--maxsize',
             default=2.,
             type=float,
             help="Max figure size (MB) before converting to JPEG (for arxiv)")
-        print self.app.confs.config('exts')
         return parser
 
     def take_action(self, parsed_args):
@@ -53,10 +57,8 @@ class Package(Command):
         self._ext_priority = parsed_args.exts
         self._max_size = parsed_args.maxsize
 
-        print "_ext_priority", self._ext_priority
-
         bbl_path = ".".join((os.path.splitext(self.app.options.master)[0],
-            'bbl'))
+                             'bbl'))
 
         with codecs.open(self.app.options.master, 'r', encoding='utf-8') as f:
             root_text = f.read()
@@ -68,18 +70,19 @@ class Package(Command):
                 bbl_text = f.read()
             tex = inline_bbl(tex, bbl_text)
         else:
-            print "No", bbl_path
+            self.log.debug("Skipping .bbl installation")
 
         if self._build_style == "aastex":
             output_tex_path = os.path.join(dirname, "ms.tex")
         else:
-            output_tex_path = os.path.join(dirname,
-                    os.path.basename(self.app.options.master))
+            output_tex_path = os.path.join(
+                dirname,
+                os.path.basename(self.app.options.master))
         self._write_tex(tex, output_tex_path)
 
     def _process_figures(self, tex, dirname):
         """Discover figures and copy to root of build directory.
-        
+
         Returns
         -------
         figs : dict
@@ -94,10 +97,11 @@ class Package(Command):
             aas_numbering = False
             maxsize = self._max_size
 
-        tex = install_figs(tex, figs, dirname,
-                aas_numbering=aas_numbering,
-                format_priority=self._ext_priority,
-                max_size=maxsize)
+        tex = install_figs(
+            tex, figs, dirname,
+            aas_numbering=aas_numbering,
+            format_priority=self._ext_priority,
+            max_size=maxsize)
         return tex
 
     def _write_tex(self, tex, path):
@@ -116,8 +120,9 @@ def discover_figures(tex, ext_priority):
         as the key and and values are dicts with keys: path, options and
         figure environment.
     """
-    figs_pattern = re.compile(ur"\\includegraphics(.*?){(.*?)}",
-            re.UNICODE)
+    figs_pattern = re.compile(
+        ur"\\includegraphics(.*?){(.*?)}",
+        re.UNICODE)
     matches = figs_pattern.findall(tex)
     figs = {}
     for i, match in enumerate(matches):
@@ -154,8 +159,8 @@ def _find_exts(fig_path, ext_priority):
 
 
 def install_figs(tex, figs, install_dir, aas_numbering=False,
-        format_priority=('pdf', 'eps', 'ps', 'png', 'jpg', 'tif'),
-        max_size=None):
+                 format_priority=('pdf', 'eps', 'ps', 'png', 'jpg', 'tif'),
+                 max_size=None):
     """Copy each figure to the build directory and update tex with new path.
 
     Parameters
@@ -165,7 +170,8 @@ def install_figs(tex, figs, install_dir, aas_numbering=False,
         If ``None``, no conversions are attempted.
     """
     for figname, fig in figs.iteritems():
-        if len(fig['exts']) == 0: continue
+        if len(fig['exts']) == 0:
+            continue
         # get the priority graphics file type
         for ext in format_priority:
             if ext in fig['exts']:
@@ -174,11 +180,13 @@ def install_figs(tex, figs, install_dir, aas_numbering=False,
                 break
         # copy fig to the build directory
         if aas_numbering:
-            install_path = os.path.join(install_dir,
-                    u"f{0:d}.{1}".format(fig['num'], ext))
+            install_path = os.path.join(
+                install_dir,
+                u"f{0:d}.{1}".format(fig['num'], ext))
         else:
-            install_path = os.path.join(install_dir,
-                    os.path.basename(full_path))
+            install_path = os.path.join(
+                install_dir,
+                os.path.basename(full_path))
         figs[figname]["installed_path"] = install_path
         shutil.copy(full_path, install_path)
         if max_size and figsize > max_size:
