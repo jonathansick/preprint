@@ -91,15 +91,13 @@ class Package(Command):
         """
         figs = discover_figures(tex, self._ext_priority)
         if self._build_style == "aastex":
-            aas_numbering = True
             maxsize = None
         elif self._build_style == "arxiv":
-            aas_numbering = False
             maxsize = self._max_size
 
         tex = install_figs(
             tex, figs, dirname,
-            aas_numbering=aas_numbering,
+            naming=self._build_style,
             format_priority=self._ext_priority,
             max_size=maxsize)
         return tex
@@ -158,13 +156,24 @@ def _find_exts(fig_path, ext_priority):
     return tuple(has_exts)
 
 
-def install_figs(tex, figs, install_dir, aas_numbering=False,
+def install_figs(tex, figs, install_dir, naming=None,
                  format_priority=('pdf', 'eps', 'ps', 'png', 'jpg', 'tif'),
                  max_size=None):
     """Copy each figure to the build directory and update tex with new path.
 
     Parameters
     ----------
+    tex : unicode
+        The tex document as a unicode string.
+    figs : dict
+        A dictionary with figure names (without extension or directory)
+        as the key and and values are dicts with keys: path, options and
+        figure environment.
+    naming : str
+        Style for figure naming, (``'aastex'|'arxiv'|None``).
+    format_priority : list
+        List of figure file extensions, in order of preference to use in
+        the final build.
     max_size : float
         Maximum size for a figure before converting it into a JPEG.
         If ``None``, no conversions are attempted.
@@ -179,10 +188,14 @@ def install_figs(tex, figs, install_dir, aas_numbering=False,
                 full_path = ".".join((os.path.splitext(fig['path'])[0], ext))
                 break
         # copy fig to the build directory
-        if aas_numbering:
+        if naming == "aastex":
             install_path = os.path.join(
                 install_dir,
                 u"f{0:d}.{1}".format(fig['num'], ext))
+        elif naming == "arxiv":
+            install_path = os.path.join(
+                install_dir,
+                u"figure{0:d}.{1}".format(fig['num'], ext))
         else:
             install_path = os.path.join(
                 install_dir,
