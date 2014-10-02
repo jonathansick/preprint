@@ -7,7 +7,7 @@ from cliff.commandmanager import CommandManager
 from .config import Configurations
 
 
-VERSION = "0.2"
+VERSION = "0.2.1"
 
 
 class PreprintApp(App):
