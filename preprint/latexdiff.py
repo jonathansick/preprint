@@ -48,8 +48,12 @@ class Diff(Command):
 
 def git_diff_pipeline(output_name, master_path, prev_commit):
     """Pipeline for typesetting latexdiff against a commit in git history."""
+    log = logging.getLogger(__name__)
+
     current_path = inline_current(master_path)
+    log.debug("current_path {0}".format(current_path))
     prev_path = inline_prev(prev_commit, master_path)
+    log.debug("prev_path {0}".format(prev_path))
 
     # Run latexmk
     diff_path = os.path.splitext(output_name)[0]
@@ -96,7 +100,12 @@ def inline_current(root_tex):
 
 def inline_prev(commit_ref, root_tex):
     """Inline the previous manuscript in the git tree."""
+    log = logging.getLogger(__name__)
+    log.debug("inline_prev root_tex")
+    log.debug(root_tex)
     root_text = read_git_blob(commit_ref, root_tex)
+    log.debug("prev root_text")
+    log.debug(root_text)
     root_text = remove_comments(root_text)
     root_text = inline_blob(commit_ref, root_text)
     output_path = "_prev.tex"
