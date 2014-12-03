@@ -11,8 +11,8 @@ import codecs
 import shutil
 import git
 
-from preprint.textools import inline, inline_blob, remove_comments
-from preprint.gittools import read_git_blob
+from paperweight.texutils import inline, inline_blob, remove_comments
+from paperweight.gitio import read_git_blob
 
 from cliff.command import Command
 

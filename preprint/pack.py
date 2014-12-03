@@ -11,7 +11,7 @@ import codecs
 import re
 import subprocess
 
-from preprint.textools import inline, remove_comments, inline_bbl
+from paperweight.texutils import inline, remove_comments, inline_bbl
 
 from cliff.command import Command
 
