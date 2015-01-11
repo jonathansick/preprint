@@ -36,7 +36,7 @@ class Diff(Command):
     def take_action(self, parsed_args):
         # Inline current and previous versions of the document
         if parsed_args.name is None:
-            name = "HEAD_{0}".format(parsed_args.prev_commit)
+            name = "current_{0}".format(parsed_args.prev_commit)
         else:
             name = parsed_args.name
 
@@ -84,12 +84,13 @@ def git_diff_pipeline(output_name, master_path, prev_commit):
     os.remove(current_path)
 
 
-def inline_current(root_tex):
+def inline_current(root_tex_path):
     """Inline the current manuscript."""
-    with codecs.open(root_tex, 'r', encoding='utf-8') as f:
+    base_dir = os.path.dirname(root_tex_path)
+    with codecs.open(root_tex_path, 'r', encoding='utf-8') as f:
         root_text = f.read()
         root_text = remove_comments(root_text)
-        root_text = inline(root_text)
+        root_text = inline(root_text, base_dir=base_dir)
     output_path = "_current.tex"
     if os.path.exists(output_path):
         os.remove(output_path)
