@@ -12,7 +12,7 @@ import shutil
 import git
 
 from paperweight.texutils import inline, inline_blob, remove_comments
-from paperweight.gitio import read_git_blob
+from paperweight.gitio import read_git_blob, absolute_git_root_dir
 
 from cliff.command import Command
 
@@ -99,16 +99,36 @@ def inline_current(root_tex_path):
     return output_path
 
 
-def inline_prev(commit_ref, root_tex):
-    """Inline the previous manuscript in the git tree."""
+def inline_prev(commit_ref, root_tex_path):
+    """Inline the previous manuscript in the git tree.
+
+    Parameters
+    ----------
+    commif_ref : str
+        Commit reference string.
+    root_tex_path : str
+        Path to the root tex document in the filesystem.
+
+    Returns
+    -------
+    output_path : str
+        Path to the inlined latex document for latexdiff processing.
+    """
     log = logging.getLogger(__name__)
     log.debug("inline_prev root_tex")
-    log.debug(root_tex)
-    root_text = read_git_blob(commit_ref, root_tex)
+    log.debug(root_tex_path)
+    git_root = absolute_git_root_dir(root_tex_path)
+    rel_root_tex_path = os.path.relpath(os.path.abspath(root_tex_path),
+                                        git_root)
+    root_text = read_git_blob(commit_ref, rel_root_tex_path,
+                              root=git_root)
     log.debug("prev root_text")
     log.debug(root_text)
     root_text = remove_comments(root_text)
-    root_text = inline_blob(commit_ref, root_text)
+    # commit_ref, root_text, root_path, repo_dir="")
+    root_text = inline_blob(commit_ref, root_text,
+                            rel_root_tex_path,
+                            repo_dir=git_root)
     output_path = "_prev.tex"
     if os.path.exists(output_path):
         os.remove(output_path)
