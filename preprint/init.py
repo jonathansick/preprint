@@ -1,18 +1,13 @@
 #!/usr/bin/env python
 # encoding: utf-8
 import logging
-import fnmatch
 import os
-import codecs
-import re
 import json
 
 from cliff.command import Command
+from paperweight.texutils import find_root_tex_document, RootNotFound
 
 from preprint.config import Configurations
-
-
-docclass_pattern = re.compile(ur'\\documentclass{.*}', re.UNICODE)
 
 
 class Init(Command):
@@ -32,7 +27,7 @@ class Init(Command):
 def write_configs():
     """Write a default configurations file for the current project."""
     try:
-        root_tex = find_root_paper()
+        root_tex = find_root_tex_document(base_dir=".")
     except RootNotFound:
         root_tex = "article.tex"
     configs = Configurations()
@@ -45,29 +40,3 @@ def write_configs():
                            sort_keys=True,
                            indent=4,
                            separators=(',', ': ')))
-
-
-def find_root_paper():
-    """Find the tex article in the current directory that can be considered
-    a root. We do this by searching contents for `\documentclass`.
-    """
-    log = logging.getLogger(__name__)
-    for tex_path in tex_documents():
-        with codecs.open(tex_path, 'r', encoding='utf-8') as f:
-            text = f.read()
-            if len(docclass_pattern.findall(text)) > 0:
-                log.debug("Found root tex {0}".format(tex_path))
-                return tex_path
-    log.warning("Could not find a root .tex file")
-    raise RootNotFound
-
-
-def tex_documents(ignore_dirs=('build',)):
-    """Iterate through all .tex documents in the current directory"""
-    for path, dirlist, filelist in os.walk("."):
-        for name in fnmatch.filter(filelist, "*.tex"):
-            yield os.path.join(path, name)
-
-
-class RootNotFound(BaseException):
-    pass
