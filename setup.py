@@ -68,7 +68,11 @@ setup(
     scripts=[],
 
     provides=[],
-    install_requires=['cliff', 'watchdog', 'GitPython', 'pytest'],
+    install_requires=['cliff',
+                      'watchdog',
+                      'GitPython',
+                      'pytest',
+                      'paperweight'],
 
     namespace_packages=[],
     packages=find_packages(),
