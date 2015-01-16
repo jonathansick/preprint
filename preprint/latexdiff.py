@@ -121,7 +121,7 @@ def inline_prev(commit_ref, root_tex_path):
     rel_root_tex_path = os.path.relpath(os.path.abspath(root_tex_path),
                                         git_root)
     root_text = read_git_blob(commit_ref, rel_root_tex_path,
-                              root=git_root)
+                              repo_dir=git_root)
     log.debug("prev root_text")
     log.debug(root_text)
     root_text = remove_comments(root_text)
