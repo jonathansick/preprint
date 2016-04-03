@@ -125,9 +125,8 @@ def inline_prev(commit_ref, root_tex_path):
     log.debug("prev root_text")
     log.debug(root_text)
     root_text = remove_comments(root_text)
-    # commit_ref, root_text, root_path, repo_dir="")
     root_text = inline_blob(commit_ref, root_text,
-                            rel_root_tex_path,
+                            base_dir=os.path.dirname(rel_root_tex_path),
                             repo_dir=git_root)
     output_path = "_prev.tex"
     if os.path.exists(output_path):
