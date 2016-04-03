@@ -57,7 +57,7 @@ def git_diff_pipeline(output_name, master_path, prev_commit):
 
     # Run latexmk
     diff_path = os.path.splitext(output_name)[0]
-    ldiff_cmd = "latexdiff {prev} {current} > {diff}.tex".\
+    ldiff_cmd = "latexdiff --type=CTRADITIONAL {prev} {current} > {diff}.tex".\
         format(prev=prev_path, current=current_path, diff=diff_path)
     subprocess.call(ldiff_cmd, shell=True)
 
