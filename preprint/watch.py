@@ -50,7 +50,7 @@ class Watch(Command):
 
     def _watch(self, handler):
         observer = Observer()
-        observer.schedule(handler, '.')
+        observer.schedule(handler, '.', recursive=True)
         observer.start()
         try:
             while True:
